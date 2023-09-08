@@ -82,11 +82,7 @@ class ConnectedCommand(object):
         """The status code of the process.
         If the code is None, assume that it's still running.
         """
-        if self._status_code is not None:
-            return self._status_code
-
-        # investigate
-        return None
+        return self._status_code if self._status_code is not None else None
 
     @property
     def pid(self):
@@ -101,7 +97,6 @@ class ConnectedCommand(object):
         """Block until given bytes appear in the stream."""
         if stream is None:
             stream = self.std_out
-        pass
 
     def send(self, end='\n'):
         """Sends a line to std_in."""
@@ -146,8 +141,7 @@ def expand_args(command):
         command = []
 
         while True:
-            token = splitter.get_token()
-            if token:
+            if token := splitter.get_token():
                 command.append(token)
             else:
                 break
@@ -170,7 +164,7 @@ def run(command, data=None, timeout=None, env=None):
 
         if len(history):
             # due to broken pipe problems pass only first 10MB
-            data = history[-1].std_out[0:10*1024]
+            data = history[-1].std_out[:10*1024]
 
         cmd = Command(c)
         out, err = cmd.run(data, timeout, env)
